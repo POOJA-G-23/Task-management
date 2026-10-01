@@ -9,7 +9,7 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const systemColorScheme = useColorScheme();
-  const [themeMode, setThemeMode] = useState('light');
+  const [themeMode, setThemeMode] = useState('dark');
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -17,8 +17,8 @@ export const ThemeProvider = ({ children }) => {
       const savedTheme = await loadThemeFromStorage();
       if (savedTheme) {
         setThemeMode(savedTheme);
-      } else if (systemColorScheme) {
-        setThemeMode(systemColorScheme);
+      } else {
+        setThemeMode('dark');
       }
       setIsReady(true);
     };

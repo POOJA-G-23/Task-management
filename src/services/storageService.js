@@ -46,10 +46,10 @@ export const saveTasksToStorage = async (tasks) => {
 export const loadThemeFromStorage = async () => {
   try {
     const theme = await AsyncStorage.getItem(STORAGE_KEYS.THEME_MODE);
-    return theme || 'light';
+    return theme || 'dark';
   } catch (error) {
     console.error('Error loading theme preference:', error);
-    return 'light';
+    return 'dark';
   }
 };
 

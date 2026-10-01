@@ -94,7 +94,7 @@ export const BottomTabNavigator = () => {
                   styles.addIconCircle,
                   {
                     backgroundColor: colors.primary,
-                    borderColor: isDark ? '#0D1322' : '#FFFFFF',
+                    borderColor: isDark ? '#090C13' : '#FFFFFF',
                   },
                 ]}
               >

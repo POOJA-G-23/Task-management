@@ -1,92 +1,121 @@
-// Enhanced Application Theme - Modern, Vibrant & Glassmorphic Design Tokens
+// Ultra-Professional Dark Theme & High-Tech Design System (Linear / Raycast Style)
 
 export const colors = {
-  // Vibrant Brand Indigo & Violet Accents
-  primary: '#6366F1', // Electric Indigo
-  primaryDark: '#4F46E5',
-  primaryDeep: '#3730A3',
+  // Brand Accents
+  primary: '#6366F1', // Electric Violet / Indigo
   primaryLight: '#818CF8',
-  primaryMuted: '#EEF2FF',
-  primaryGlow: 'rgba(99, 102, 241, 0.35)',
+  primaryDark: '#4F46E5',
+  primaryMuted: '#1E1B4B',
+  primaryGlow: 'rgba(99, 102, 241, 0.4)',
 
-  // Energetic Accents
+  // Neon Functional Accents
   accent: '#10B981', // Emerald Teal
   accentLight: '#34D399',
   accentGlow: 'rgba(16, 185, 129, 0.35)',
 
-  amber: '#F59E0B',
-  rose: '#F43F5E',
-  purple: '#A855F7',
-  cyan: '#06B6D4',
+  rose: '#FF4565',
+  amber: '#FBBF24',
+  purple: '#C084FC',
+  cyan: '#38BDF8',
+  slate: '#94A3B8',
 
-  // Priority Palettes with rich dark & light aesthetics
+  // Priority Palettes - Professional Cyber Dark Aesthetics
   priority: {
     High: {
-      color: '#F43F5E',
-      glow: 'rgba(244, 63, 94, 0.3)',
+      color: '#FF4565',
+      glow: 'rgba(255, 69, 101, 0.35)',
       bgLight: '#FFE4E6',
       borderLight: '#FDA4AF',
-      bgDark: '#2E111A',
-      borderDark: '#881337',
-      stripe: '#F43F5E',
+      bgDark: '#260B12',
+      borderDark: '#5E1624',
+      stripe: '#FF4565',
     },
     Medium: {
-      color: '#F59E0B',
-      glow: 'rgba(245, 158, 11, 0.3)',
+      color: '#FBBF24',
+      glow: 'rgba(251, 191, 36, 0.35)',
       bgLight: '#FEF3C7',
       borderLight: '#FCD34D',
-      bgDark: '#2C1D06',
-      borderDark: '#78350F',
-      stripe: '#F59E0B',
+      bgDark: '#261904',
+      borderDark: '#5C3807',
+      stripe: '#FBBF24',
     },
     Low: {
-      color: '#3B82F6',
-      glow: 'rgba(59, 130, 246, 0.3)',
+      color: '#38BDF8',
+      glow: 'rgba(56, 189, 248, 0.35)',
       bgLight: '#DBEAFE',
       borderLight: '#93C5FD',
-      bgDark: '#0B2347',
-      borderDark: '#1E3A8A',
-      stripe: '#3B82F6',
+      bgDark: '#081D33',
+      borderDark: '#123C66',
+      stripe: '#38BDF8',
     },
   },
 
-  // Category Palettes with customized gradient tints & icons
+  // Category Palettes with Neon Accents
   categories: {
     Personal: {
-      color: '#A855F7',
+      color: '#C084FC',
       bgLight: '#F3E8FF',
-      bgDark: 'rgba(168, 85, 247, 0.15)',
-      borderDark: 'rgba(168, 85, 247, 0.35)',
+      bgDark: 'rgba(192, 132, 252, 0.12)',
+      borderDark: 'rgba(192, 132, 252, 0.28)',
       icon: 'person',
-      gradient: ['#A855F7', '#7C3AED'],
+      gradient: ['#C084FC', '#9333EA'],
     },
     College: {
-      color: '#0EA5E9',
+      color: '#38BDF8',
       bgLight: '#E0F2FE',
-      bgDark: 'rgba(14, 165, 233, 0.15)',
-      borderDark: 'rgba(14, 165, 233, 0.35)',
+      bgDark: 'rgba(56, 189, 248, 0.12)',
+      borderDark: 'rgba(56, 189, 248, 0.28)',
       icon: 'school',
-      gradient: ['#0EA5E9', '#0284C7'],
+      gradient: ['#38BDF8', '#0284C7'],
     },
     Work: {
-      color: '#10B981',
+      color: '#34D399',
       bgLight: '#D1FAE5',
-      bgDark: 'rgba(16, 185, 129, 0.15)',
-      borderDark: 'rgba(16, 185, 129, 0.35)',
+      bgDark: 'rgba(52, 211, 153, 0.12)',
+      borderDark: 'rgba(52, 211, 153, 0.28)',
       icon: 'briefcase',
-      gradient: ['#10B981', '#059669'],
+      gradient: ['#34D399', '#059669'],
     },
     Other: {
-      color: '#F97316',
+      color: '#FB923C',
       bgLight: '#FFEDD5',
-      bgDark: 'rgba(249, 115, 22, 0.15)',
-      borderDark: 'rgba(249, 115, 22, 0.35)',
+      bgDark: 'rgba(251, 146, 60, 0.12)',
+      borderDark: 'rgba(251, 146, 60, 0.28)',
       icon: 'sparkles',
-      gradient: ['#F97316', '#EA580C'],
+      gradient: ['#FB923C', '#EA580C'],
     },
   },
 
-  // Premium Light Theme
+  // ULTRA-SLEEK PROFESSIONAL DARK THEME (Linear/Raycast inspired)
+  dark: {
+    background: '#080A0F', // Obsidian pitch black canvas
+    backgroundSubtle: '#0E121B',
+    surface: '#111622', // Elevated Obsidian card
+    surfaceSecondary: '#161D2E',
+    surfaceElevated: '#1A2338',
+    card: '#111622',
+    cardBorder: 'rgba(255, 255, 255, 0.08)',
+    text: '#F8FAFC', // Ultra crisp white
+    textSecondary: '#94A3B8', // Slate grey
+    textMuted: '#64748B', // Muted slate
+    border: 'rgba(255, 255, 255, 0.08)',
+    borderLight: 'rgba(255, 255, 255, 0.04)',
+    borderHighlight: 'rgba(99, 102, 241, 0.4)',
+    inputBg: '#0B0E17',
+    inputBorder: '#1E2638',
+    tabBarBg: '#090C13',
+    tabBarBorder: 'rgba(255, 255, 255, 0.07)',
+    headerBg: '#080A0F',
+    shadow: 'rgba(0, 0, 0, 0.65)',
+    shadowColored: 'rgba(99, 102, 241, 0.35)',
+    danger: '#FF4565',
+    success: '#34D399',
+    warning: '#FBBF24',
+    bannerBg: '#0E1324',
+    bannerBorder: 'rgba(99, 102, 241, 0.35)',
+  },
+
+  // Premium Light Theme (Fallback option)
   light: {
     background: '#F8FAFC',
     backgroundSubtle: '#F1F5F9',
@@ -94,52 +123,25 @@ export const colors = {
     surfaceSecondary: '#F1F5F9',
     surfaceElevated: '#FFFFFF',
     card: '#FFFFFF',
-    cardBorder: 'rgba(226, 232, 240, 0.8)',
+    cardBorder: '#E2E8F0',
     text: '#0F172A',
     textSecondary: '#475569',
     textMuted: '#94A3B8',
     border: '#E2E8F0',
     borderLight: '#F1F5F9',
+    borderHighlight: '#6366F1',
     inputBg: '#F8FAFC',
     inputBorder: '#E2E8F0',
     tabBarBg: '#FFFFFF',
-    tabBarBorder: 'rgba(226, 232, 240, 0.8)',
+    tabBarBorder: '#E2E8F0',
     headerBg: '#FFFFFF',
     shadow: 'rgba(15, 23, 42, 0.08)',
     shadowColored: 'rgba(99, 102, 241, 0.15)',
     danger: '#F43F5E',
     success: '#10B981',
     warning: '#F59E0B',
-    bannerGradientStart: '#4F46E5',
-    bannerGradientEnd: '#7C3AED',
-  },
-
-  // Ultra-Sleek Dark Theme (Cyber Slate / Deep Navy)
-  dark: {
-    background: '#090D16',
-    backgroundSubtle: '#0E1422',
-    surface: '#131B2E',
-    surfaceSecondary: '#1A243B',
-    surfaceElevated: '#1E293B',
-    card: '#131B2E',
-    cardBorder: 'rgba(99, 102, 241, 0.18)',
-    text: '#F8FAFC',
-    textSecondary: '#94A3B8',
-    textMuted: '#64748B',
-    border: '#1F2A42',
-    borderLight: '#172033',
-    inputBg: '#0B101D',
-    inputBorder: '#23304D',
-    tabBarBg: '#0D1322',
-    tabBarBorder: '#1A243B',
-    headerBg: '#0D1322',
-    shadow: 'rgba(0, 0, 0, 0.5)',
-    shadowColored: 'rgba(99, 102, 241, 0.3)',
-    danger: '#FB7185',
-    success: '#34D399',
-    warning: '#FBBF24',
-    bannerGradientStart: '#312E81',
-    bannerGradientEnd: '#4C1D95',
+    bannerBg: '#4F46E5',
+    bannerBorder: 'rgba(79, 70, 229, 0.3)',
   },
 };
 
@@ -162,25 +164,4 @@ export const borderRadius = {
   xl: 22,
   xxl: 28,
   full: 9999,
-};
-
-export const shadows = {
-  soft: {
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  medium: {
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.14,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  glow: {
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
-    elevation: 6,
-  },
 };

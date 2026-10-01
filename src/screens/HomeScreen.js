@@ -145,8 +145,8 @@ export const HomeScreen = ({ navigation }) => {
           style={[
             styles.heroBanner,
             {
-              backgroundColor: isDark ? '#1E1B4B' : '#4F46E5',
-              borderColor: isDark ? 'rgba(99, 102, 241, 0.4)' : 'rgba(79, 70, 229, 0.3)',
+              backgroundColor: isDark ? '#101524' : '#4F46E5',
+              borderColor: isDark ? 'rgba(99, 102, 241, 0.35)' : 'rgba(79, 70, 229, 0.3)',
             },
           ]}
         >
