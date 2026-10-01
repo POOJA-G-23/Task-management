@@ -1,5 +1,4 @@
-// TaskForm Component
-// Reusable form component for both Add and Edit task operations
+// Enhanced TaskForm Component - Polished Inputs, Glowing Selectors & Haptics
 
 import React, { useState } from 'react';
 import {
@@ -10,7 +9,6 @@ import {
   TouchableOpacity,
   ScrollView,
   Switch,
-  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius } from '../styles/theme';
@@ -46,6 +44,10 @@ export const TaskForm = ({
     initialValues?.reminder !== undefined ? initialValues.reminder : true
   );
 
+  // Focus states
+  const [titleFocused, setTitleFocused] = useState(false);
+  const [descFocused, setDescFocused] = useState(false);
+
   // Validation errors
   const [errors, setErrors] = useState({});
 
@@ -57,9 +59,9 @@ export const TaskForm = ({
   const validate = () => {
     const newErrors = {};
     if (!title.trim()) {
-      newErrors.title = 'Task title is required';
+      newErrors.title = 'Please enter a task title';
     } else if (title.trim().length < 3) {
-      newErrors.title = 'Title must be at least 3 characters';
+      newErrors.title = 'Title must be at least 3 characters long';
     }
 
     if (!dueDate) {
@@ -98,37 +100,49 @@ export const TaskForm = ({
     >
       {/* Title Field */}
       <View style={styles.formGroup}>
-        <Text style={[styles.label, { color: theme.text }]}>
-          Task Title <Text style={{ color: colors.light.danger }}>*</Text>
-        </Text>
+        <View style={styles.labelRow}>
+          <Text style={[styles.label, { color: theme.text }]}>Task Title</Text>
+          <Text style={[styles.requiredBadge, { color: colors.rose }]}>Required</Text>
+        </View>
         <TextInput
           style={[
             styles.input,
             {
               backgroundColor: theme.inputBg,
               color: theme.text,
-              borderColor: errors.title ? colors.light.danger : theme.border,
+              borderColor: errors.title
+                ? colors.rose
+                : titleFocused
+                ? colors.primary
+                : theme.inputBorder,
+              shadowColor: titleFocused ? colors.primary : 'transparent',
+              shadowOpacity: titleFocused ? 0.2 : 0,
             },
           ]}
-          placeholder="e.g. Prepare Mobile App Presentation"
+          placeholder="e.g. Complete Experiment 3 Report & Testing"
           placeholderTextColor={theme.textMuted}
           value={title}
           onChangeText={(val) => {
             setTitle(val);
             if (errors.title) setErrors((prev) => ({ ...prev, title: null }));
           }}
+          onFocus={() => setTitleFocused(true)}
+          onBlur={() => setTitleFocused(false)}
           maxLength={100}
         />
         {errors.title && (
-          <Text style={[styles.errorText, { color: colors.light.danger }]}>
-            {errors.title}
-          </Text>
+          <View style={styles.errorRow}>
+            <Ionicons name="alert-circle" size={14} color={colors.rose} style={{ marginRight: 4 }} />
+            <Text style={[styles.errorText, { color: colors.rose }]}>
+              {errors.title}
+            </Text>
+          </View>
         )}
       </View>
 
       {/* Description Field */}
       <View style={styles.formGroup}>
-        <Text style={[styles.label, { color: theme.text }]}>Description</Text>
+        <Text style={[styles.label, { color: theme.text }]}>Description & Notes</Text>
         <TextInput
           style={[
             styles.input,
@@ -136,13 +150,17 @@ export const TaskForm = ({
             {
               backgroundColor: theme.inputBg,
               color: theme.text,
-              borderColor: theme.border,
+              borderColor: descFocused ? colors.primary : theme.inputBorder,
+              shadowColor: descFocused ? colors.primary : 'transparent',
+              shadowOpacity: descFocused ? 0.2 : 0,
             },
           ]}
-          placeholder="Add details, notes, links, or instructions..."
+          placeholder="Add actionable steps, references, links, or notes..."
           placeholderTextColor={theme.textMuted}
           value={description}
           onChangeText={setDescription}
+          onFocus={() => setDescFocused(true)}
+          onBlur={() => setDescFocused(false)}
           multiline
           numberOfLines={4}
           textAlignVertical="top"
@@ -151,9 +169,7 @@ export const TaskForm = ({
 
       {/* Due Date & Time Section */}
       <View style={styles.formGroup}>
-        <Text style={[styles.label, { color: theme.text }]}>
-          Schedule (Date & Time)
-        </Text>
+        <Text style={[styles.label, { color: theme.text }]}>Schedule</Text>
         <View style={styles.scheduleRow}>
           {/* Date Picker Button */}
           <TouchableOpacity
@@ -161,24 +177,22 @@ export const TaskForm = ({
               styles.pickerButton,
               {
                 backgroundColor: theme.inputBg,
-                borderColor: theme.border,
+                borderColor: theme.inputBorder,
               },
             ]}
             onPress={() => openPicker('date')}
             activeOpacity={0.7}
           >
-            <Ionicons
-              name="calendar-outline"
-              size={18}
-              color={colors.primary}
-              style={{ marginRight: 8 }}
-            />
-            <View>
+            <View style={[styles.pickerIconBg, { backgroundColor: isDark ? '#1E1B4B' : '#EEF2FF' }]}>
+              <Ionicons name="calendar" size={18} color={colors.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
               <Text style={[styles.pickerSubtext, { color: theme.textMuted }]}>Due Date</Text>
               <Text style={[styles.pickerValueText, { color: theme.text }]}>
                 {formatFriendlyDate(dueDate)}
               </Text>
             </View>
+            <Ionicons name="chevron-forward" size={16} color={theme.textMuted} />
           </TouchableOpacity>
 
           {/* Time Picker Button */}
@@ -187,91 +201,72 @@ export const TaskForm = ({
               styles.pickerButton,
               {
                 backgroundColor: theme.inputBg,
-                borderColor: theme.border,
+                borderColor: theme.inputBorder,
               },
             ]}
             onPress={() => openPicker('time')}
             activeOpacity={0.7}
           >
-            <Ionicons
-              name="time-outline"
-              size={18}
-              color={colors.primary}
-              style={{ marginRight: 8 }}
-            />
-            <View>
+            <View style={[styles.pickerIconBg, { backgroundColor: isDark ? '#064E3B' : '#D1FAE5' }]}>
+              <Ionicons name="time" size={18} color={colors.accent} />
+            </View>
+            <View style={{ flex: 1 }}>
               <Text style={[styles.pickerSubtext, { color: theme.textMuted }]}>Due Time</Text>
               <Text style={[styles.pickerValueText, { color: theme.text }]}>
                 {formatTime12Hour(dueTime)}
               </Text>
             </View>
+            <Ionicons name="chevron-forward" size={16} color={theme.textMuted} />
           </TouchableOpacity>
         </View>
 
         {/* Quick Date Chips */}
         <View style={styles.quickChipsRow}>
-          <TouchableOpacity
-            style={[
-              styles.quickChip,
-              { backgroundColor: theme.surfaceSecondary },
-              dueDate === getDateOffset(0) && { backgroundColor: colors.primary },
-            ]}
-            onPress={() => setDueDate(getDateOffset(0))}
-          >
-            <Text
-              style={[
-                styles.quickChipText,
-                { color: dueDate === getDateOffset(0) ? '#FFFFFF' : theme.textSecondary },
-              ]}
-            >
-              Today
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.quickChip,
-              { backgroundColor: theme.surfaceSecondary },
-              dueDate === getDateOffset(1) && { backgroundColor: colors.primary },
-            ]}
-            onPress={() => setDueDate(getDateOffset(1))}
-          >
-            <Text
-              style={[
-                styles.quickChipText,
-                { color: dueDate === getDateOffset(1) ? '#FFFFFF' : theme.textSecondary },
-              ]}
-            >
-              Tomorrow
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.quickChip,
-              { backgroundColor: theme.surfaceSecondary },
-              dueDate === getDateOffset(7) && { backgroundColor: colors.primary },
-            ]}
-            onPress={() => setDueDate(getDateOffset(7))}
-          >
-            <Text
-              style={[
-                styles.quickChipText,
-                { color: dueDate === getDateOffset(7) ? '#FFFFFF' : theme.textSecondary },
-              ]}
-            >
-              Next Week
-            </Text>
-          </TouchableOpacity>
+          {[
+            { label: 'Today', offset: 0 },
+            { label: 'Tomorrow', offset: 1 },
+            { label: 'Next Week', offset: 7 },
+          ].map((chip) => {
+            const isChipActive = dueDate === getDateOffset(chip.offset);
+            return (
+              <TouchableOpacity
+                key={chip.label}
+                style={[
+                  styles.quickChip,
+                  {
+                    backgroundColor: isChipActive
+                      ? colors.primary
+                      : theme.surfaceSecondary,
+                    borderColor: isChipActive ? colors.primary : theme.border,
+                  },
+                ]}
+                onPress={() => setDueDate(getDateOffset(chip.offset))}
+                activeOpacity={0.75}
+              >
+                <Text
+                  style={[
+                    styles.quickChipText,
+                    {
+                      color: isChipActive ? '#FFFFFF' : theme.textSecondary,
+                      fontWeight: isChipActive ? '700' : '600',
+                    },
+                  ]}
+                >
+                  {chip.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </View>
 
       {/* Priority Selector */}
       <View style={styles.formGroup}>
-        <Text style={[styles.label, { color: theme.text }]}>Priority Level</Text>
+        <Text style={[styles.label, { color: theme.text }]}>Priority</Text>
         <View style={styles.priorityRow}>
           {PRIORITIES.map((p) => {
             const isSelected = priority === p.id;
+            const pConf = colors.priority[p.id];
             return (
               <TouchableOpacity
                 key={p.id}
@@ -280,13 +275,12 @@ export const TaskForm = ({
                   {
                     backgroundColor: isSelected
                       ? isDark
-                        ? colors.priority[p.id].bgDark
-                        : colors.priority[p.id].bgLight
+                        ? pConf.bgDark
+                        : pConf.bgLight
                       : theme.inputBg,
-                    borderColor: isSelected
-                      ? colors.priority[p.id].color
-                      : theme.border,
+                    borderColor: isSelected ? pConf.color : theme.inputBorder,
                   },
+                  isSelected && styles.prioritySelectedShadow,
                 ]}
                 onPress={() => setPriority(p.id)}
                 activeOpacity={0.8}
@@ -294,15 +288,15 @@ export const TaskForm = ({
                 <Ionicons
                   name={p.icon}
                   size={16}
-                  color={isSelected ? colors.priority[p.id].color : theme.textMuted}
+                  color={isSelected ? pConf.color : theme.textMuted}
                   style={{ marginRight: 6 }}
                 />
                 <Text
                   style={[
                     styles.priorityText,
                     {
-                      color: isSelected ? colors.priority[p.id].color : theme.textSecondary,
-                      fontWeight: isSelected ? '700' : '500',
+                      color: isSelected ? pConf.color : theme.textSecondary,
+                      fontWeight: isSelected ? '800' : '600',
                     },
                   ]}
                 >
@@ -316,7 +310,7 @@ export const TaskForm = ({
 
       {/* Category Selector */}
       <View style={styles.formGroup}>
-        <Text style={[styles.label, { color: theme.text }]}>Category</Text>
+        <Text style={[styles.label, { color: theme.text }]}>Category Domain</Text>
         <View style={styles.categoryGrid}>
           {CATEGORIES.map((c) => {
             const isSelected = category === c.id;
@@ -331,24 +325,32 @@ export const TaskForm = ({
                         ? 'rgba(255,255,255,0.1)'
                         : c.bg
                       : theme.inputBg,
-                    borderColor: isSelected ? c.color : theme.border,
+                    borderColor: isSelected ? c.color : theme.inputBorder,
                   },
                 ]}
                 onPress={() => setCategory(c.id)}
                 activeOpacity={0.8}
               >
-                <Ionicons
-                  name={c.icon}
-                  size={18}
-                  color={isSelected ? c.color : theme.textMuted}
-                  style={{ marginRight: 6 }}
-                />
+                <View
+                  style={[
+                    styles.catIconMini,
+                    {
+                      backgroundColor: isSelected ? c.color : isDark ? 'rgba(255,255,255,0.08)' : '#F1F5F9',
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name={c.icon}
+                    size={16}
+                    color={isSelected ? '#FFFFFF' : c.color}
+                  />
+                </View>
                 <Text
                   style={[
                     styles.categoryText,
                     {
                       color: isSelected ? c.color : theme.textSecondary,
-                      fontWeight: isSelected ? '700' : '500',
+                      fontWeight: isSelected ? '800' : '600',
                     },
                   ]}
                 >
@@ -360,13 +362,13 @@ export const TaskForm = ({
         </View>
       </View>
 
-      {/* Reminder Toggle */}
+      {/* Reminder Toggle Card */}
       <View
         style={[
           styles.reminderCard,
           {
             backgroundColor: theme.inputBg,
-            borderColor: theme.border,
+            borderColor: theme.inputBorder,
           },
         ]}
       >
@@ -374,7 +376,7 @@ export const TaskForm = ({
           <View
             style={[
               styles.reminderIconBg,
-              { backgroundColor: reminder ? 'rgba(79, 70, 229, 0.15)' : theme.surfaceSecondary },
+              { backgroundColor: reminder ? (isDark ? '#1E1B4B' : '#EEF2FF') : theme.surfaceSecondary },
             ]}
           >
             <Ionicons
@@ -385,10 +387,10 @@ export const TaskForm = ({
           </View>
           <View style={{ flex: 1, marginLeft: spacing.md }}>
             <Text style={[styles.reminderTitle, { color: theme.text }]}>
-              Task Notification Reminder
+              Task Due Reminder
             </Text>
             <Text style={[styles.reminderSubtitle, { color: theme.textSecondary }]}>
-              Receive an alert when this task is due
+              Receive an automatic alert when this task is due
             </Text>
           </View>
         </View>
@@ -429,12 +431,12 @@ export const TaskForm = ({
           activeOpacity={0.8}
         >
           <Ionicons
-            name="checkmark-circle-outline"
+            name="checkmark-circle"
             size={18}
             color="#FFFFFF"
             style={{ marginRight: 6 }}
           />
-          <Text style={[styles.buttonText, { color: '#FFFFFF', fontWeight: '700' }]}>
+          <Text style={[styles.buttonText, { color: '#FFFFFF', fontWeight: '800' }]}>
             {isLoading ? 'Saving...' : submitButtonText}
           </Text>
         </TouchableOpacity>
@@ -464,28 +466,44 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxxl * 2,
   },
   formGroup: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xl,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.xs + 2,
   },
   label: {
     fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+    marginBottom: spacing.xs,
+  },
+  requiredBadge: {
+    fontSize: 11,
     fontWeight: '600',
-    marginBottom: spacing.xs + 2,
   },
   input: {
-    height: 48,
+    height: 50,
     borderRadius: borderRadius.md,
-    borderWidth: 1,
+    borderWidth: 1.5,
     paddingHorizontal: spacing.md,
     fontSize: 15,
   },
   textArea: {
-    height: 100,
+    height: 105,
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
   errorText: {
     fontSize: 12,
-    marginTop: 4,
+    fontWeight: '500',
   },
   scheduleRow: {
     flexDirection: 'row',
@@ -497,30 +515,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.md,
     borderRadius: borderRadius.md,
-    borderWidth: 1,
+    borderWidth: 1.5,
+  },
+  pickerIconBg: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.sm,
   },
   pickerSubtext: {
     fontSize: 11,
     fontWeight: '500',
   },
   pickerValueText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
     marginTop: 2,
   },
   quickChipsRow: {
     flexDirection: 'row',
     gap: spacing.sm,
-    marginTop: spacing.sm,
+    marginTop: spacing.sm + 2,
   },
   quickChip: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: borderRadius.full,
+    borderWidth: 1,
   },
   quickChipText: {
     fontSize: 12,
-    fontWeight: '600',
   },
   priorityRow: {
     flexDirection: 'row',
@@ -534,6 +560,12 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderRadius: borderRadius.md,
     borderWidth: 1.5,
+  },
+  prioritySelectedShadow: {
+    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
   priorityText: {
     fontSize: 13,
@@ -552,6 +584,14 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     borderWidth: 1.5,
   },
+  catIconMini: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.sm,
+  },
   categoryText: {
     fontSize: 13,
   },
@@ -559,9 +599,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: spacing.md,
+    padding: spacing.md + 2,
     borderRadius: borderRadius.md,
-    borderWidth: 1,
+    borderWidth: 1.5,
     marginBottom: spacing.xl,
   },
   reminderInfo: {
@@ -572,13 +612,13 @@ const styles = StyleSheet.create({
   reminderIconBg: {
     width: 38,
     height: 38,
-    borderRadius: 10,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
   reminderTitle: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   reminderSubtitle: {
     fontSize: 12,
@@ -591,21 +631,21 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    height: 48,
+    height: 50,
     borderRadius: borderRadius.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelBtn: {
-    borderWidth: 1,
+    borderWidth: 1.5,
   },
   submitBtn: {
-    elevation: 3,
+    elevation: 5,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
   },
   buttonText: {
     fontSize: 15,

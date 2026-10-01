@@ -1,4 +1,4 @@
-// SettingsScreen Component
+// Enhanced SettingsScreen Component - Executive Preferences & Analytics
 
 import React, { useState } from 'react';
 import {
@@ -26,6 +26,7 @@ export const SettingsScreen = () => {
     completedTasks,
     pendingTasks,
     completionRate,
+    highPriorityCount,
     clearCompletedTasks,
     resetWithSamples,
   } = useTasks();
@@ -33,13 +34,13 @@ export const SettingsScreen = () => {
   // Modal dialog states
   const [clearModalVisible, setClearModalVisible] = useState(false);
   const [resetModalVisible, setResetModalVisible] = useState(false);
-  const [notificationStatusMsg, setNotificationStatusMsg] = useState(null);
+  const [isTestingNotification, setIsTestingNotification] = useState(false);
 
   const handleClearCompleted = async () => {
     try {
       const count = await clearCompletedTasks();
       setClearModalVisible(false);
-      Alert.alert('Success', `Cleared ${count} completed task(s).`);
+      Alert.alert('Cleared Completed Tasks', `Removed ${count} completed task(s) from your storage.`);
     } catch (e) {
       Alert.alert('Error', 'Failed to clear completed tasks.');
     }
@@ -49,18 +50,23 @@ export const SettingsScreen = () => {
     try {
       await resetWithSamples();
       setResetModalVisible(false);
-      Alert.alert('Success', 'Application data reset to default sample tasks.');
+      Alert.alert('Data Reset Successful', 'Original sample tasks have been restored for demonstration.');
     } catch (e) {
       Alert.alert('Error', 'Failed to reset application data.');
     }
   };
 
   const handleTestNotification = async () => {
+    setIsTestingNotification(true);
     const res = await sendTestNotification();
+    setIsTestingNotification(false);
     if (res.success) {
-      Alert.alert('Test Notification Sent', 'Check your device notification drawer!');
+      Alert.alert('Notification Alert Sent', 'Look at your Android notification bar or banner!');
     } else {
-      Alert.alert('Notice', 'Notification permission may not be enabled or supported on this device/simulator.');
+      Alert.alert(
+        'Notification Info',
+        'Notification sent or running in a simulator environment without native push hardware.'
+      );
     }
   };
 
@@ -78,10 +84,38 @@ export const SettingsScreen = () => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: theme.text }]}>Settings</Text>
+          <Text style={[styles.title, { color: theme.text }]}>Settings & Info</Text>
           <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-            Preferences, analytics, and data management
+            Preferences, appearance, analytics & data controls
           </Text>
+        </View>
+
+        {/* PROFILE CARD */}
+        <View
+          style={[
+            styles.profileCard,
+            {
+              backgroundColor: theme.card,
+              borderColor: theme.border,
+            },
+          ]}
+        >
+          <View style={styles.profileAvatar}>
+            <Ionicons name="person" size={26} color="#FFFFFF" />
+          </View>
+          <View style={styles.profileInfo}>
+            <View style={styles.profileNameRow}>
+              <Text style={[styles.profileName, { color: theme.text }]}>
+                Student Developer
+              </Text>
+              <View style={[styles.proBadge, { backgroundColor: 'rgba(99, 102, 241, 0.2)' }]}>
+                <Text style={[styles.proBadgeText, { color: colors.primary }]}>PRO</Text>
+              </View>
+            </View>
+            <Text style={[styles.profileRole, { color: theme.textSecondary }]}>
+              Application Development Lab • Exp 3
+            </Text>
+          </View>
         </View>
 
         {/* SECTION 1: APPEARANCE */}
@@ -99,7 +133,7 @@ export const SettingsScreen = () => {
               <View
                 style={[
                   styles.iconContainer,
-                  { backgroundColor: isDark ? '#2D1B69' : '#EEF2FF' },
+                  { backgroundColor: isDark ? '#1E1B4B' : '#EEF2FF' },
                 ]}
               >
                 <Ionicons
@@ -113,7 +147,7 @@ export const SettingsScreen = () => {
                   Dark Theme
                 </Text>
                 <Text style={[styles.settingDesc, { color: theme.textSecondary }]}>
-                  {isDark ? 'Dark theme is currently active' : 'Light theme is currently active'}
+                  {isDark ? 'Cyber Slate Dark palette enabled' : 'Clean Modern Light palette enabled'}
                 </Text>
               </View>
             </View>
@@ -128,7 +162,7 @@ export const SettingsScreen = () => {
 
         {/* SECTION 2: NOTIFICATIONS */}
         <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
-          NOTIFICATIONS & ALERTS
+          NOTIFICATIONS & REMINDERS
         </Text>
         <View
           style={[
@@ -139,6 +173,7 @@ export const SettingsScreen = () => {
           <TouchableOpacity
             style={styles.settingRow}
             onPress={handleTestNotification}
+            disabled={isTestingNotification}
             activeOpacity={0.7}
           >
             <View style={styles.settingLeft}>
@@ -149,7 +184,7 @@ export const SettingsScreen = () => {
                 ]}
               >
                 <Ionicons
-                  name="notifications-outline"
+                  name="notifications"
                   size={20}
                   color={colors.accent}
                 />
@@ -159,7 +194,7 @@ export const SettingsScreen = () => {
                   Send Test Notification
                 </Text>
                 <Text style={[styles.settingDesc, { color: theme.textSecondary }]}>
-                  Verify that task alert notifications work on your device
+                  {isTestingNotification ? 'Sending notification alert...' : 'Trigger an instant local alert notification'}
                 </Text>
               </View>
             </View>
@@ -167,9 +202,9 @@ export const SettingsScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* SECTION 3: PRODUCTIVITY OVERVIEW */}
+        {/* SECTION 3: PRODUCTIVITY ANALYTICS */}
         <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
-          TASK ANALYTICS SUMMARY
+          PRODUCTIVITY OVERVIEW
         </Text>
         <View
           style={[
@@ -178,9 +213,12 @@ export const SettingsScreen = () => {
           ]}
         >
           <View style={styles.analyticRow}>
-            <Text style={[styles.analyticLabel, { color: theme.textSecondary }]}>
-              Total Tasks
-            </Text>
+            <View style={styles.analyticIconLabel}>
+              <Ionicons name="layers-outline" size={18} color={colors.primary} style={{ marginRight: 8 }} />
+              <Text style={[styles.analyticLabel, { color: theme.textSecondary }]}>
+                Total Created Tasks
+              </Text>
+            </View>
             <Text style={[styles.analyticValue, { color: theme.text }]}>
               {totalTasks}
             </Text>
@@ -188,9 +226,12 @@ export const SettingsScreen = () => {
           <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
           <View style={styles.analyticRow}>
-            <Text style={[styles.analyticLabel, { color: theme.textSecondary }]}>
-              Tasks Completed
-            </Text>
+            <View style={styles.analyticIconLabel}>
+              <Ionicons name="checkmark-done-circle-outline" size={18} color={colors.accent} style={{ marginRight: 8 }} />
+              <Text style={[styles.analyticLabel, { color: theme.textSecondary }]}>
+                Tasks Completed
+              </Text>
+            </View>
             <Text style={[styles.analyticValue, { color: colors.accent }]}>
               {completedTasks}
             </Text>
@@ -198,19 +239,38 @@ export const SettingsScreen = () => {
           <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
           <View style={styles.analyticRow}>
-            <Text style={[styles.analyticLabel, { color: theme.textSecondary }]}>
-              Tasks Pending
-            </Text>
-            <Text style={[styles.analyticValue, { color: colors.light.warning }]}>
+            <View style={styles.analyticIconLabel}>
+              <Ionicons name="time-outline" size={18} color={colors.amber} style={{ marginRight: 8 }} />
+              <Text style={[styles.analyticLabel, { color: theme.textSecondary }]}>
+                Tasks Pending
+              </Text>
+            </View>
+            <Text style={[styles.analyticValue, { color: colors.amber }]}>
               {pendingTasks}
             </Text>
           </View>
           <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
           <View style={styles.analyticRow}>
-            <Text style={[styles.analyticLabel, { color: theme.textSecondary }]}>
-              Overall Completion Rate
+            <View style={styles.analyticIconLabel}>
+              <Ionicons name="flame-outline" size={18} color={colors.rose} style={{ marginRight: 8 }} />
+              <Text style={[styles.analyticLabel, { color: theme.textSecondary }]}>
+                High Priority Pending
+              </Text>
+            </View>
+            <Text style={[styles.analyticValue, { color: colors.rose }]}>
+              {highPriorityCount}
             </Text>
+          </View>
+          <View style={[styles.divider, { backgroundColor: theme.border }]} />
+
+          <View style={styles.analyticRow}>
+            <View style={styles.analyticIconLabel}>
+              <Ionicons name="pie-chart-outline" size={18} color={colors.primary} style={{ marginRight: 8 }} />
+              <Text style={[styles.analyticLabel, { color: theme.textSecondary }]}>
+                Completion Rate
+              </Text>
+            </View>
             <Text style={[styles.analyticValue, { color: colors.primary }]}>
               {completionRate}%
             </Text>
@@ -219,7 +279,7 @@ export const SettingsScreen = () => {
 
         {/* SECTION 4: DATA MANAGEMENT */}
         <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
-          DATA STORAGE & ACTIONS
+          STORAGE & DATA CONTROLS
         </Text>
         <View
           style={[
@@ -242,7 +302,7 @@ export const SettingsScreen = () => {
                 <Ionicons
                   name="trash-bin-outline"
                   size={20}
-                  color={colors.light.warning}
+                  color={colors.amber}
                 />
               </View>
               <View style={styles.settingTextContainer}>
@@ -250,7 +310,7 @@ export const SettingsScreen = () => {
                   Clear Completed Tasks
                 </Text>
                 <Text style={[styles.settingDesc, { color: theme.textSecondary }]}>
-                  Remove finished tasks while keeping pending ones
+                  Safely remove finished tasks and keep pending ones
                 </Text>
               </View>
             </View>
@@ -268,21 +328,21 @@ export const SettingsScreen = () => {
               <View
                 style={[
                   styles.iconContainer,
-                  { backgroundColor: isDark ? '#3B1318' : '#FEE2E2' },
+                  { backgroundColor: isDark ? '#2E111A' : '#FFE4E6' },
                 ]}
               >
                 <Ionicons
-                  name="refresh-outline"
+                  name="refresh"
                   size={20}
-                  color={colors.light.danger}
+                  color={colors.rose}
                 />
               </View>
               <View style={styles.settingTextContainer}>
-                <Text style={[styles.settingLabel, { color: colors.light.danger }]}>
+                <Text style={[styles.settingLabel, { color: colors.rose }]}>
                   Reset All Application Data
                 </Text>
                 <Text style={[styles.settingDesc, { color: theme.textSecondary }]}>
-                  Restores original sample tasks for testing
+                  Restores initial sample tasks for evaluation & demo
                 </Text>
               </View>
             </View>
@@ -290,9 +350,9 @@ export const SettingsScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* SECTION 5: APP INFO */}
+        {/* SECTION 5: APP INFORMATION */}
         <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
-          APPLICATION INFORMATION
+          APPLICATION SPECIFICATIONS
         </Text>
         <View
           style={[
@@ -301,47 +361,31 @@ export const SettingsScreen = () => {
           ]}
         >
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: theme.textSecondary }]}>
-              App Name
-            </Text>
-            <Text style={[styles.infoValue, { color: theme.text }]}>
-              TaskMaster Mobile
-            </Text>
+            <Text style={[styles.infoLabel, { color: theme.textSecondary }]}>App Name</Text>
+            <Text style={[styles.infoValue, { color: theme.text }]}>TaskMaster Mobile</Text>
           </View>
           <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: theme.textSecondary }]}>
-              Version
-            </Text>
-            <Text style={[styles.infoValue, { color: theme.text }]}>
-              1.0.0 (Release)
-            </Text>
+            <Text style={[styles.infoLabel, { color: theme.textSecondary }]}>Version</Text>
+            <Text style={[styles.infoValue, { color: theme.text }]}>1.0.0 (Release)</Text>
           </View>
           <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: theme.textSecondary }]}>
-              Framework
-            </Text>
-            <Text style={[styles.infoValue, { color: theme.text }]}>
-              React Native + Expo SDK 57
-            </Text>
+            <Text style={[styles.infoLabel, { color: theme.textSecondary }]}>Technology</Text>
+            <Text style={[styles.infoValue, { color: theme.text }]}>JavaScript + React Native + Expo</Text>
           </View>
           <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
           <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: theme.textSecondary }]}>
-              Lab Course
-            </Text>
-            <Text style={[styles.infoValue, { color: theme.text }]}>
-              Application Development Lab - Exp 3
-            </Text>
+            <Text style={[styles.infoLabel, { color: theme.textSecondary }]}>Persistence</Text>
+            <Text style={[styles.infoValue, { color: theme.text }]}>AsyncStorage Engine</Text>
           </View>
         </View>
 
         <Text style={[styles.footerText, { color: theme.textMuted }]}>
-          Crafted with modern mobile standards & clean JavaScript.
+          TaskMaster Mobile • Application Development Lab
         </Text>
       </ScrollView>
 
@@ -349,7 +393,7 @@ export const SettingsScreen = () => {
       <ConfirmationModal
         visible={clearModalVisible}
         title="Clear Completed Tasks?"
-        message={`This will permanently delete ${completedTasks} completed task(s) from your storage.`}
+        message={`Are you sure you want to remove ${completedTasks} completed task(s)? This cannot be undone.`}
         confirmText="Clear Completed"
         cancelText="Cancel"
         isDestructive={true}
@@ -361,7 +405,7 @@ export const SettingsScreen = () => {
       <ConfirmationModal
         visible={resetModalVisible}
         title="Reset Application Data?"
-        message="This will wipe your current tasks and restore initial sample tasks for demonstration."
+        message="This will wipe your current tasks and re-seed the starter demonstration tasks."
         confirmText="Reset Everything"
         cancelText="Cancel"
         isDestructive={true}
@@ -389,17 +433,64 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '800',
-    letterSpacing: -0.3,
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 13,
     marginTop: 2,
   },
+  profileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.lg,
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    marginBottom: spacing.xl,
+    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+  },
+  profileAvatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  profileNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  profileName: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  proBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  proBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  profileRole: {
+    fontSize: 12,
+    marginTop: 2,
+  },
   sectionTitle: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
     letterSpacing: 0.8,
     marginBottom: spacing.sm,
     marginLeft: 4,
@@ -414,7 +505,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: spacing.md,
+    padding: spacing.md + 2,
   },
   settingLeft: {
     flexDirection: 'row',
@@ -423,9 +514,9 @@ const styles = StyleSheet.create({
     marginRight: spacing.sm,
   },
   iconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -435,7 +526,7 @@ const styles = StyleSheet.create({
   },
   settingLabel: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   settingDesc: {
     fontSize: 12,
@@ -452,12 +543,17 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
   },
+  analyticIconLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   analyticLabel: {
     fontSize: 14,
+    fontWeight: '500',
   },
   analyticValue: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '800',
   },
   infoRow: {
     flexDirection: 'row',
@@ -471,7 +567,7 @@ const styles = StyleSheet.create({
   },
   infoValue: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   footerText: {
     textAlign: 'center',

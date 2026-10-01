@@ -1,4 +1,4 @@
-// BottomTabNavigator Component
+// Enhanced BottomTabNavigator Component - Floating Center Action & Badges
 
 import React from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
@@ -28,18 +28,20 @@ export const BottomTabNavigator = () => {
         tabBarStyle: {
           backgroundColor: theme.tabBarBg,
           borderTopColor: theme.tabBarBorder,
-          height: Platform.OS === 'ios' ? 88 : 64,
+          borderTopWidth: 1,
+          height: Platform.OS === 'ios' ? 88 : 66,
           paddingBottom: Platform.OS === 'ios' ? 28 : 10,
           paddingTop: 8,
-          elevation: 8,
+          elevation: 10,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.06,
-          shadowRadius: 6,
+          shadowOffset: { width: 0, height: -3 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
         },
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '600',
+          fontWeight: '700',
+          marginTop: -2,
         },
       }}
     >
@@ -51,7 +53,7 @@ export const BottomTabNavigator = () => {
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? 'home' : 'home-outline'}
-              size={22}
+              size={23}
               color={color}
             />
           ),
@@ -65,15 +67,15 @@ export const BottomTabNavigator = () => {
           tabBarLabel: 'Tasks',
           tabBarBadge: pendingTasks > 0 ? pendingTasks : undefined,
           tabBarBadgeStyle: {
-            backgroundColor: colors.primary,
+            backgroundColor: colors.rose,
             fontSize: 10,
-            fontWeight: '700',
+            fontWeight: '800',
             color: '#FFFFFF',
           },
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? 'checkbox' : 'checkbox-outline'}
-              size={22}
+              size={23}
               color={color}
             />
           ),
@@ -84,15 +86,20 @@ export const BottomTabNavigator = () => {
         name="AddTask"
         component={AddTaskScreen}
         options={{
-          tabBarLabel: 'Add Task',
+          tabBarLabel: '',
           tabBarIcon: ({ focused }) => (
-            <View
-              style={[
-                styles.addIconCircle,
-                { backgroundColor: colors.primary },
-              ]}
-            >
-              <Ionicons name="add" size={24} color="#FFFFFF" />
+            <View style={styles.addBtnContainer}>
+              <View
+                style={[
+                  styles.addIconCircle,
+                  {
+                    backgroundColor: colors.primary,
+                    borderColor: isDark ? '#0D1322' : '#FFFFFF',
+                  },
+                ]}
+              >
+                <Ionicons name="add" size={26} color="#FFFFFF" />
+              </View>
             </View>
           ),
         }}
@@ -106,7 +113,7 @@ export const BottomTabNavigator = () => {
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? 'settings' : 'settings-outline'}
-              size={22}
+              size={23}
               color={color}
             />
           ),
@@ -117,16 +124,22 @@ export const BottomTabNavigator = () => {
 };
 
 const styles = StyleSheet.create({
-  addIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  addBtnContainer: {
+    top: -12,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4,
+  },
+  addIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.45,
+    shadowRadius: 8,
   },
 });

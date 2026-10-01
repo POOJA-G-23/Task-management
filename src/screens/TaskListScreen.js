@@ -1,5 +1,4 @@
-// TaskListScreen Component
-// Complete task browsing, filtering, searching, and sorting screen
+// Enhanced TaskListScreen Component - Linear-style Filtering, Search & Sorting
 
 import React, { useState, useMemo } from 'react';
 import {
@@ -25,14 +24,23 @@ import { FILTER_OPTIONS, SORT_OPTIONS, CATEGORIES } from '../utils/constants';
 
 export const TaskListScreen = ({ navigation, route }) => {
   const { theme, isDark } = useTheme();
-  const { tasks, toggleTaskCompleted, deleteTask } = useTasks();
+  const {
+    tasks,
+    totalTasks,
+    completedTasks,
+    pendingTasks,
+    highPriorityCount,
+    toggleTaskCompleted,
+    deleteTask,
+  } = useTasks();
 
-  // Route parameters for initial filter if navigated from Category chip
+  // Initial filter from params
   const initialFilter = route?.params?.filter || 'All';
   const initialCategory = route?.params?.category || null;
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
   const [activeFilter, setActiveFilter] = useState(initialFilter);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [activeSort, setActiveSort] = useState('dueDate_asc');
@@ -65,7 +73,6 @@ export const TaskListScreen = ({ navigation, route }) => {
         return true;
       })
       .sort((a, b) => {
-        // Priority weights
         const priorityWeight = { High: 3, Medium: 2, Low: 1 };
 
         switch (activeSort) {
@@ -98,6 +105,25 @@ export const TaskListScreen = ({ navigation, route }) => {
     }
   };
 
+  // Badge count for filters
+  const getFilterCount = (filterId) => {
+    switch (filterId) {
+      case 'All':
+        return totalTasks;
+      case 'Pending':
+        return pendingTasks;
+      case 'Completed':
+        return completedTasks;
+      case 'High Priority':
+        return highPriorityCount;
+      default:
+        return 0;
+    }
+  };
+
+  const currentSortLabel =
+    SORT_OPTIONS.find((s) => s.id === activeSort)?.label || 'Due Date';
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
       <StatusBar
@@ -109,51 +135,60 @@ export const TaskListScreen = ({ navigation, route }) => {
       <View style={styles.header}>
         <View>
           <Text style={[styles.headerTitle, { color: theme.text }]}>
-            Tasks & To-Dos
+            All Tasks
           </Text>
           <Text style={[styles.headerSubtitle, { color: theme.textSecondary }]}>
-            Showing {filteredAndSortedTasks.length} of {tasks.length} total tasks
+            {filteredAndSortedTasks.length} {filteredAndSortedTasks.length === 1 ? 'task' : 'tasks'} shown
           </Text>
         </View>
 
         {/* Sort Modal Toggle Button */}
         <TouchableOpacity
-          style={[styles.sortButton, { backgroundColor: theme.surfaceSecondary }]}
+          style={[
+            styles.sortButton,
+            {
+              backgroundColor: isDark ? '#1E1B4B' : '#EEF2FF',
+              borderColor: isDark ? 'rgba(99, 102, 241, 0.3)' : '#C7D2FE',
+            },
+          ]}
           onPress={() => setSortModalVisible(true)}
           activeOpacity={0.7}
         >
-          <Ionicons name="swap-vertical" size={18} color={colors.primary} />
+          <Ionicons name="swap-vertical" size={15} color={colors.primary} />
           <Text style={[styles.sortButtonText, { color: colors.primary }]}>
             Sort
           </Text>
         </TouchableOpacity>
       </View>
 
-      {/* Search Input Bar */}
+      {/* Modern Search Bar */}
       <View style={styles.searchContainer}>
         <View
           style={[
             styles.searchBar,
             {
               backgroundColor: theme.inputBg,
-              borderColor: theme.border,
+              borderColor: searchFocused ? colors.primary : theme.inputBorder,
+              shadowColor: searchFocused ? colors.primary : 'transparent',
+              shadowOpacity: searchFocused ? 0.2 : 0,
             },
           ]}
         >
           <Ionicons
-            name="search-outline"
+            name="search"
             size={18}
-            color={theme.textMuted}
+            color={searchFocused ? colors.primary : theme.textMuted}
             style={{ marginRight: 8 }}
           />
           <TextInput
             style={[styles.searchInput, { color: theme.text }]}
-            placeholder="Search by title or description..."
+            placeholder="Search tasks, notes, keywords..."
             placeholderTextColor={theme.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
             returnKeyType="search"
-            clearButtonMode="while-editing"
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
@@ -163,7 +198,7 @@ export const TaskListScreen = ({ navigation, route }) => {
         </View>
       </View>
 
-      {/* Filter Tabs (All, Pending, Completed, High Priority) */}
+      {/* Status Filter Tabs (with Live Counter Badges) */}
       <View style={styles.filterTabsContainer}>
         <FlatList
           horizontal
@@ -173,6 +208,7 @@ export const TaskListScreen = ({ navigation, route }) => {
           contentContainerStyle={styles.filterTabsScroll}
           renderItem={({ item }) => {
             const isActive = activeFilter === item.id;
+            const count = getFilterCount(item.id);
             return (
               <TouchableOpacity
                 style={[
@@ -181,10 +217,12 @@ export const TaskListScreen = ({ navigation, route }) => {
                     backgroundColor: isActive
                       ? colors.primary
                       : theme.surfaceSecondary,
+                    borderColor: isActive ? colors.primary : theme.border,
                   },
+                  isActive && styles.filterTabGlow,
                 ]}
                 onPress={() => setActiveFilter(item.id)}
-                activeOpacity={0.7}
+                activeOpacity={0.75}
               >
                 <Ionicons
                   name={item.icon}
@@ -197,12 +235,33 @@ export const TaskListScreen = ({ navigation, route }) => {
                     styles.filterTabText,
                     {
                       color: isActive ? '#FFFFFF' : theme.textSecondary,
-                      fontWeight: isActive ? '700' : '500',
+                      fontWeight: isActive ? '800' : '600',
                     },
                   ]}
                 >
                   {item.label}
                 </Text>
+                <View
+                  style={[
+                    styles.filterCountBadge,
+                    {
+                      backgroundColor: isActive
+                        ? 'rgba(255, 255, 255, 0.25)'
+                        : isDark
+                        ? 'rgba(255, 255, 255, 0.08)'
+                        : '#E2E8F0',
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.filterCountText,
+                      { color: isActive ? '#FFFFFF' : theme.textSecondary },
+                    ]}
+                  >
+                    {count}
+                  </Text>
+                </View>
               </TouchableOpacity>
             );
           }}
@@ -226,7 +285,7 @@ export const TaskListScreen = ({ navigation, route }) => {
                   {
                     backgroundColor: isSelected
                       ? isDark
-                        ? 'rgba(79, 70, 229, 0.25)'
+                        ? 'rgba(99, 102, 241, 0.2)'
                         : '#EEF2FF'
                       : 'transparent',
                     borderColor: isSelected ? colors.primary : theme.border,
@@ -268,12 +327,12 @@ export const TaskListScreen = ({ navigation, route }) => {
         )}
         ListEmptyComponent={
           <EmptyState
-            icon={searchQuery ? 'search-outline' : 'checkbox-outline'}
-            title={searchQuery ? 'No matching tasks' : 'No tasks in this view'}
+            icon={searchQuery ? 'search' : 'layers-outline'}
+            title={searchQuery ? 'No matching tasks found' : 'No tasks in this category'}
             subtitle={
               searchQuery
-                ? `No tasks found matching "${searchQuery}". Try different keywords.`
-                : 'Tap "+ Add Task" to schedule your next achievement!'
+                ? `No tasks matched your query "${searchQuery}". Check spelling or clear filters.`
+                : 'Stay organized and ahead of schedule by adding a new task.'
             }
             buttonText={searchQuery ? 'Clear Search' : 'Add New Task'}
             onButtonPress={() => {
@@ -284,7 +343,7 @@ export const TaskListScreen = ({ navigation, route }) => {
         }
       />
 
-      {/* Sort Selection Bottom Modal */}
+      {/* Sort Selection Bottom Sheet Modal */}
       <Modal
         visible={sortModalVisible}
         transparent
@@ -300,6 +359,8 @@ export const TaskListScreen = ({ navigation, route }) => {
                   { backgroundColor: theme.card, borderColor: theme.border },
                 ]}
               >
+                <View style={styles.sheetHandle} />
+
                 <View style={styles.modalHeader}>
                   <Text style={[styles.modalTitle, { color: theme.text }]}>
                     Sort Tasks By
@@ -321,7 +382,7 @@ export const TaskListScreen = ({ navigation, route }) => {
                         styles.sortOptionRow,
                         isChosen && {
                           backgroundColor: isDark
-                            ? 'rgba(79, 70, 229, 0.15)'
+                            ? 'rgba(99, 102, 241, 0.15)'
                             : '#EEF2FF',
                         },
                       ]}
@@ -344,7 +405,7 @@ export const TaskListScreen = ({ navigation, route }) => {
                       </Text>
                       {isChosen && (
                         <Ionicons
-                          name="checkmark"
+                          name="checkmark-circle"
                           size={18}
                           color={colors.primary}
                         />
@@ -390,27 +451,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
+    paddingBottom: spacing.xs,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: '800',
-    letterSpacing: -0.3,
+    letterSpacing: -0.5,
   },
   headerSubtitle: {
     fontSize: 12,
     marginTop: 2,
+    fontWeight: '500',
   },
   sortButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 7,
     borderRadius: borderRadius.md,
+    borderWidth: 1,
     gap: 4,
   },
   sortButtonText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
   },
   searchContainer: {
@@ -420,9 +483,9 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 44,
+    height: 48,
     borderRadius: borderRadius.md,
-    borderWidth: 1,
+    borderWidth: 1.5,
     paddingHorizontal: spacing.md,
   },
   searchInput: {
@@ -439,12 +502,30 @@ const styles = StyleSheet.create({
   filterTab: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: borderRadius.full,
+    borderWidth: 1,
+  },
+  filterTabGlow: {
+    elevation: 3,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   filterTabText: {
     fontSize: 12,
+  },
+  filterCountBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: borderRadius.full,
+    marginLeft: 6,
+  },
+  filterCountText: {
+    fontSize: 10,
+    fontWeight: '700',
   },
   categoryPillsContainer: {
     marginVertical: 6,
@@ -454,9 +535,9 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   categoryPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: borderRadius.sm,
+    paddingHorizontal: 11,
+    paddingVertical: 5,
+    borderRadius: borderRadius.full,
     borderWidth: 1,
   },
   categoryPillText: {
@@ -468,14 +549,22 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'flex-end',
   },
   modalBox: {
-    borderTopLeftRadius: borderRadius.xl,
-    borderTopRightRadius: borderRadius.xl,
+    borderTopLeftRadius: borderRadius.xxl,
+    borderTopRightRadius: borderRadius.xxl,
     padding: spacing.xl,
     borderTopWidth: 1,
+  },
+  sheetHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(150, 150, 150, 0.4)',
+    alignSelf: 'center',
+    marginBottom: spacing.md,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -497,6 +586,6 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   sortOptionText: {
-    fontSize: 15,
+    fontSize: 14,
   },
 });

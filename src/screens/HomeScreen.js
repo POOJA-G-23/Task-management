@@ -1,4 +1,4 @@
-// HomeScreen Component
+// Enhanced HomeScreen Component - Modern Executive Dashboard
 
 import React, { useState } from 'react';
 import {
@@ -23,7 +23,7 @@ import { ConfirmationModal } from '../components/ConfirmationModal';
 import { CATEGORIES } from '../utils/constants';
 
 export const HomeScreen = ({ navigation }) => {
-  const { theme, isDark } = useTheme();
+  const { theme, isDark, toggleTheme } = useTheme();
   const {
     tasks,
     totalTasks,
@@ -40,6 +40,7 @@ export const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
+  const [todayFilter, setTodayFilter] = useState('all'); // 'all' | 'pending'
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -61,10 +62,15 @@ export const HomeScreen = ({ navigation }) => {
 
   // Current Date display
   const currentDateFormatted = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
+    weekday: 'short',
     month: 'short',
     day: 'numeric',
   });
+
+  const displayedTodayTasks =
+    todayFilter === 'pending'
+      ? todayTasks.filter((t) => !t.completed)
+      : todayTasks;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
@@ -86,83 +92,123 @@ export const HomeScreen = ({ navigation }) => {
           />
         }
       >
-        {/* Header Greeting */}
-        <View style={styles.header}>
+        {/* Top Header Row */}
+        <View style={styles.topHeader}>
           <View>
-            <Text style={[styles.dateText, { color: theme.textSecondary }]}>
-              {currentDateFormatted}
-            </Text>
+            <View style={styles.dateBadge}>
+              <Ionicons name="calendar-outline" size={13} color={colors.primary} style={{ marginRight: 4 }} />
+              <Text style={[styles.dateText, { color: colors.primary }]}>
+                {currentDateFormatted}
+              </Text>
+            </View>
             <Text style={[styles.greetingText, { color: theme.text }]}>
-              Daily Dashboard 👋
+              Daily Focus ✨
             </Text>
           </View>
-          <TouchableOpacity
-            style={[styles.headerActionBtn, { backgroundColor: theme.surfaceSecondary }]}
-            onPress={() => navigation.navigate('Settings')}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="settings-outline" size={22} color={theme.text} />
-          </TouchableOpacity>
+
+          {/* Header Action Buttons */}
+          <View style={styles.headerActions}>
+            {/* Quick Dark/Light Mode Switcher */}
+            <TouchableOpacity
+              style={[
+                styles.headerIconBtn,
+                { backgroundColor: theme.surfaceSecondary, borderColor: theme.border },
+              ]}
+              onPress={toggleTheme}
+              activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons
+                name={isDark ? 'sunny' : 'moon'}
+                size={18}
+                color={isDark ? colors.amber : colors.primary}
+              />
+            </TouchableOpacity>
+
+            {/* Quick Settings Icon */}
+            <TouchableOpacity
+              style={[
+                styles.headerIconBtn,
+                { backgroundColor: theme.surfaceSecondary, borderColor: theme.border },
+              ]}
+              onPress={() => navigation.navigate('Settings')}
+              activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="cog-outline" size={19} color={theme.text} />
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* Progress Banner */}
+        {/* HERO GRADIENT PRODUCTIVITY BANNER */}
         <View
           style={[
-            styles.progressBanner,
+            styles.heroBanner,
             {
-              backgroundColor: theme.card,
-              borderColor: theme.border,
-              shadowColor: theme.shadow,
+              backgroundColor: isDark ? '#1E1B4B' : '#4F46E5',
+              borderColor: isDark ? 'rgba(99, 102, 241, 0.4)' : 'rgba(79, 70, 229, 0.3)',
             },
           ]}
         >
-          <View style={styles.bannerHeader}>
-            <View>
-              <Text style={[styles.bannerTitle, { color: theme.text }]}>
-                {completionRate === 100
-                  ? 'All tasks completed! 🎉'
-                  : completionRate > 50
-                  ? 'Great progress today! 🚀'
-                  : 'Let’s crush some goals today! 💪'}
+          {/* Decorative Background Circles */}
+          <View style={styles.decorCircle1} />
+          <View style={styles.decorCircle2} />
+
+          <View style={styles.heroTopRow}>
+            <View style={{ flex: 1, paddingRight: spacing.md }}>
+              <View style={styles.streakPill}>
+                <Ionicons name="flame" size={14} color="#F59E0B" style={{ marginRight: 4 }} />
+                <Text style={styles.streakText}>Active Productivity Flow</Text>
+              </View>
+              <Text style={styles.heroTitle}>
+                {completionRate === 100 && totalTasks > 0
+                  ? 'All tasks completed!'
+                  : completionRate >= 50
+                  ? 'Great momentum today!'
+                  : 'Start your agenda today!'}
               </Text>
-              <Text style={[styles.bannerSubtitle, { color: theme.textSecondary }]}>
-                {completedTasks} of {totalTasks} total tasks completed
+              <Text style={styles.heroSubtitle}>
+                {completedTasks} completed out of {totalTasks} total tasks
               </Text>
             </View>
-            <View
-              style={[
-                styles.percentCircle,
-                { backgroundColor: isDark ? 'rgba(79, 70, 229, 0.2)' : '#EEF2FF' },
-              ]}
-            >
-              <Text style={[styles.percentCircleText, { color: colors.primary }]}>
-                {completionRate}%
-              </Text>
+
+            {/* Glowing Percentage Badge */}
+            <View style={styles.heroProgressBadge}>
+              <Text style={styles.heroProgressNumber}>{completionRate}%</Text>
+              <Text style={styles.heroProgressLabel}>DONE</Text>
             </View>
           </View>
 
-          <ProgressBar progress={completionRate} height={8} showLabel={false} />
+          {/* Slim Progress Bar */}
+          <View style={styles.heroBarTrack}>
+            <View
+              style={[
+                styles.heroBarFill,
+                { width: `${Math.min(Math.max(completionRate, 4), 100)}%` },
+              ]}
+            />
+          </View>
         </View>
 
-        {/* Stat Cards 2x2 Grid */}
+        {/* 2x2 METRICS GRID */}
         <View style={styles.statsGrid}>
           <View style={styles.statsRow}>
             <StatCard
               icon="calendar"
               iconColor="#3B82F6"
-              iconBg={isDark ? '#0E294B' : '#DBEAFE'}
+              iconBg={isDark ? '#0B2347' : '#DBEAFE'}
               label="Today's Tasks"
               value={todayTasks.length}
-              subtext={`${todayPendingTasks.length} pending`}
+              subtext={`${todayPendingTasks.length} to do`}
               onPress={() => navigation.navigate('Tasks', { filter: 'All' })}
             />
             <StatCard
               icon="layers"
-              iconColor="#8B5CF6"
-              iconBg={isDark ? '#2D1B69' : '#F3E8FF'}
+              iconColor="#A855F7"
+              iconBg={isDark ? '#2E1065' : '#F3E8FF'}
               label="Total Tasks"
               value={totalTasks}
-              subtext="Active in app"
+              subtext="Stored in app"
               onPress={() => navigation.navigate('Tasks', { filter: 'All' })}
             />
           </View>
@@ -174,7 +220,7 @@ export const HomeScreen = ({ navigation }) => {
               iconBg={isDark ? '#064E3B' : '#D1FAE5'}
               label="Completed"
               value={completedTasks}
-              subtext="Tasks finished"
+              subtext="Finished tasks"
               onPress={() => navigation.navigate('Tasks', { filter: 'Completed' })}
             />
             <StatCard
@@ -183,23 +229,30 @@ export const HomeScreen = ({ navigation }) => {
               iconBg={isDark ? '#451A03' : '#FEF3C7'}
               label="Pending"
               value={pendingTasks}
-              subtext="Tasks to do"
+              subtext="Awaiting action"
               onPress={() => navigation.navigate('Tasks', { filter: 'Pending' })}
             />
           </View>
         </View>
 
-        {/* Category Breakdown Chips */}
+        {/* CATEGORY EXPLORER */}
         <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: theme.text }]}>
-            Categories
-          </Text>
+          <View>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              Task Categories
+            </Text>
+            <Text style={[styles.sectionSubtitle, { color: theme.textSecondary }]}>
+              Tap to browse by domain
+            </Text>
+          </View>
           <TouchableOpacity
             onPress={() => navigation.navigate('Tasks', { filter: 'All' })}
+            style={styles.viewAllPill}
           >
             <Text style={[styles.viewAllText, { color: colors.primary }]}>
               View All
             </Text>
+            <Ionicons name="arrow-forward" size={12} color={colors.primary} style={{ marginLeft: 2 }} />
           </TouchableOpacity>
         </View>
 
@@ -214,7 +267,7 @@ export const HomeScreen = ({ navigation }) => {
               <TouchableOpacity
                 key={cat.id}
                 style={[
-                  styles.categoryChip,
+                  styles.categoryCard,
                   {
                     backgroundColor: theme.card,
                     borderColor: theme.border,
@@ -223,61 +276,117 @@ export const HomeScreen = ({ navigation }) => {
                 onPress={() =>
                   navigation.navigate('Tasks', { filter: 'All', category: cat.id })
                 }
-                activeOpacity={0.7}
+                activeOpacity={0.75}
               >
                 <View
                   style={[
-                    styles.categoryIconCircle,
+                    styles.catIconWrap,
                     {
                       backgroundColor: isDark
-                        ? 'rgba(255,255,255,0.08)'
+                        ? 'rgba(255, 255, 255, 0.08)'
                         : cat.bg,
                     },
                   ]}
                 >
-                  <Ionicons name={cat.icon} size={18} color={cat.color} />
+                  <Ionicons name={cat.icon} size={20} color={cat.color} />
                 </View>
-                <View>
-                  <Text style={[styles.categoryName, { color: theme.text }]}>
-                    {cat.name}
-                  </Text>
-                  <Text
-                    style={[styles.categoryCount, { color: theme.textSecondary }]}
-                  >
-                    {count} {count === 1 ? 'task' : 'tasks'}
-                  </Text>
-                </View>
+
+                <Text style={[styles.catName, { color: theme.text }]}>
+                  {cat.name}
+                </Text>
+                <Text style={[styles.catCount, { color: theme.textSecondary }]}>
+                  {count} {count === 1 ? 'task' : 'tasks'}
+                </Text>
               </TouchableOpacity>
             );
           })}
         </ScrollView>
 
-        {/* Today's Tasks Section */}
+        {/* TODAY'S TASKS SCHEDULE */}
         <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: theme.text }]}>
-            Today's Schedule ({todayTasks.length})
-          </Text>
+          <View>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              Today's Agenda ({todayTasks.length})
+            </Text>
+            <Text style={[styles.sectionSubtitle, { color: theme.textSecondary }]}>
+              {todayPendingTasks.length} pending • {todayTasks.length - todayPendingTasks.length} done
+            </Text>
+          </View>
+
+          {/* Quick Add Button */}
           <TouchableOpacity
             onPress={() => navigation.navigate('AddTask')}
-            style={styles.addInlineBtn}
+            style={[styles.addQuickButton, { backgroundColor: colors.primary }]}
+            activeOpacity={0.8}
           >
-            <Ionicons name="add" size={16} color={colors.primary} />
-            <Text style={[styles.addInlineText, { color: colors.primary }]}>
-              New Task
-            </Text>
+            <Ionicons name="add" size={16} color="#FFFFFF" />
+            <Text style={styles.addQuickButtonText}>Add</Text>
           </TouchableOpacity>
         </View>
 
-        {todayTasks.length === 0 ? (
+        {/* Filter toggle for Today */}
+        {todayTasks.length > 0 && (
+          <View style={styles.todayToggleRow}>
+            <TouchableOpacity
+              style={[
+                styles.todayToggleBtn,
+                todayFilter === 'all' && [
+                  styles.todayToggleBtnActive,
+                  { backgroundColor: colors.primary },
+                ],
+              ]}
+              onPress={() => setTodayFilter('all')}
+            >
+              <Text
+                style={[
+                  styles.todayToggleText,
+                  { color: todayFilter === 'all' ? '#FFFFFF' : theme.textSecondary },
+                ]}
+              >
+                All Today ({todayTasks.length})
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.todayToggleBtn,
+                todayFilter === 'pending' && [
+                  styles.todayToggleBtnActive,
+                  { backgroundColor: colors.primary },
+                ],
+              ]}
+              onPress={() => setTodayFilter('pending')}
+            >
+              <Text
+                style={[
+                  styles.todayToggleText,
+                  { color: todayFilter === 'pending' ? '#FFFFFF' : theme.textSecondary },
+                ]}
+              >
+                Pending ({todayPendingTasks.length})
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {displayedTodayTasks.length === 0 ? (
           <EmptyState
             icon="sunny-outline"
-            title="No tasks scheduled for today"
-            subtitle="Take a breather or schedule tasks to stay on track."
+            title={
+              todayFilter === 'pending' && todayTasks.length > 0
+                ? "All today's tasks completed!"
+                : 'No tasks scheduled for today'
+            }
+            subtitle={
+              todayFilter === 'pending' && todayTasks.length > 0
+                ? 'Outstanding work! All of your agenda for today is checked off.'
+                : 'Plan your day in advance. Tap "+ Add Task" to set your goals.'
+            }
             buttonText="Create Today's Task"
             onButtonPress={() => navigation.navigate('AddTask')}
           />
         ) : (
-          todayTasks.map((task) => (
+          displayedTodayTasks.map((task) => (
             <TaskCard
               key={task.id}
               task={task}
@@ -295,7 +404,7 @@ export const HomeScreen = ({ navigation }) => {
         title="Delete Task"
         message={
           taskToDelete
-            ? `Are you sure you want to delete "${taskToDelete.title}"? This action cannot be undone.`
+            ? `Are you sure you want to delete "${taskToDelete.title}"? This cannot be undone.`
             : 'Are you sure you want to delete this task?'
         }
         confirmText="Delete"
@@ -322,66 +431,136 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     paddingBottom: spacing.xxxl * 2,
   },
-  header: {
+  topHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.lg,
     marginTop: spacing.xs,
   },
+  dateBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
   dateText: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.4,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   greetingText: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '800',
     letterSpacing: -0.5,
-    marginTop: 2,
   },
-  headerActionBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerIconBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  progressBanner: {
+  heroBanner: {
     borderRadius: borderRadius.xl,
-    padding: spacing.lg,
+    padding: spacing.xl,
     marginBottom: spacing.xl,
     borderWidth: 1,
-    elevation: 3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    overflow: 'hidden',
+    position: 'relative',
+    elevation: 6,
+    shadowColor: '#4F46E5',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 14,
   },
-  bannerHeader: {
+  decorCircle1: {
+    position: 'absolute',
+    top: -30,
+    right: -30,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  decorCircle2: {
+    position: 'absolute',
+    bottom: -40,
+    left: 20,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  heroTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
   },
-  bannerTitle: {
-    fontSize: 16,
+  streakPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: borderRadius.full,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  streakText: {
+    color: '#FFFFFF',
+    fontSize: 11,
     fontWeight: '700',
   },
-  bannerSubtitle: {
-    fontSize: 13,
-    marginTop: 2,
+  heroTitle: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '800',
+    letterSpacing: -0.3,
   },
-  percentCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  heroSubtitle: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 13,
+    marginTop: 4,
+  },
+  heroProgressBadge: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255, 255, 255, 0.18)',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  percentCircleText: {
-    fontSize: 15,
+  heroProgressNumber: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  heroProgressLabel: {
+    color: 'rgba(255, 255, 255, 0.75)',
+    fontSize: 9,
     fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  heroBarTrack: {
+    height: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  heroBarFill: {
+    height: '100%',
+    backgroundColor: '#34D399',
+    borderRadius: 4,
   },
   statsGrid: {
     gap: spacing.md,
@@ -394,56 +573,92 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     marginBottom: spacing.md,
     marginTop: spacing.sm,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    letterSpacing: -0.2,
+    fontSize: 19,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+  },
+  sectionSubtitle: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  viewAllPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
   },
   viewAllText: {
     fontSize: 13,
-    fontWeight: '600',
-  },
-  addInlineBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  addInlineText: {
-    fontSize: 13,
-    fontWeight: '600',
-    marginLeft: 2,
+    fontWeight: '700',
   },
   categoryScroll: {
     gap: spacing.sm,
     paddingBottom: spacing.sm,
     marginBottom: spacing.md,
   },
-  categoryChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md - 2,
+  categoryCard: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    minWidth: 135,
+    minWidth: 125,
+    alignItems: 'center',
+    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
   },
-  categoryIconCircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
+  catIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: spacing.sm,
+    marginBottom: spacing.sm,
   },
-  categoryName: {
+  catName: {
     fontSize: 13,
     fontWeight: '700',
+    marginBottom: 2,
   },
-  categoryCount: {
+  catCount: {
     fontSize: 11,
-    marginTop: 2,
+    fontWeight: '500',
+  },
+  addQuickButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: borderRadius.full,
+    elevation: 2,
+  },
+  addQuickButtonText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+    marginLeft: 4,
+  },
+  todayToggleRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: spacing.md,
+  },
+  todayToggleBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: borderRadius.full,
+    backgroundColor: 'transparent',
+  },
+  todayToggleBtnActive: {
+    elevation: 2,
+  },
+  todayToggleText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
