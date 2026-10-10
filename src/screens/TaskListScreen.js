@@ -156,7 +156,7 @@ export const TaskListScreen = ({ navigation, route }) => {
         >
           <Ionicons name="swap-vertical" size={15} color={colors.primary} />
           <Text style={[styles.sortButtonText, { color: colors.primary }]}>
-            Sort
+            {currentSortLabel}
           </Text>
         </TouchableOpacity>
       </View>

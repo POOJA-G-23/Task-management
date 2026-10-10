@@ -9,7 +9,7 @@ import {
   StatusBar,
   Alert,
 } from 'react-native';
-import { colors, spacing } from '../styles/theme';
+import { spacing } from '../styles/theme';
 import { useTheme } from '../context/ThemeContext';
 import { useTasks } from '../context/TaskContext';
 import { TaskForm } from '../components/TaskForm';

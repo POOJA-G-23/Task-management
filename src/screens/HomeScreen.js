@@ -16,7 +16,6 @@ import { colors, spacing, borderRadius } from '../styles/theme';
 import { useTheme } from '../context/ThemeContext';
 import { useTasks } from '../context/TaskContext';
 import { StatCard } from '../components/StatCard';
-import { ProgressBar } from '../components/ProgressBar';
 import { TaskCard } from '../components/TaskCard';
 import { EmptyState } from '../components/EmptyState';
 import { ConfirmationModal } from '../components/ConfirmationModal';
@@ -25,7 +24,6 @@ import { CATEGORIES } from '../utils/constants';
 export const HomeScreen = ({ navigation }) => {
   const { theme, isDark, toggleTheme } = useTheme();
   const {
-    tasks,
     totalTasks,
     completedTasks,
     pendingTasks,
@@ -306,7 +304,7 @@ export const HomeScreen = ({ navigation }) => {
         <View style={styles.sectionHeader}>
           <View>
             <Text style={[styles.sectionTitle, { color: theme.text }]}>
-              Today's Agenda ({todayTasks.length})
+              Today&apos;s Agenda ({todayTasks.length})
             </Text>
             <Text style={[styles.sectionSubtitle, { color: theme.textSecondary }]}>
               {todayPendingTasks.length} pending • {todayTasks.length - todayPendingTasks.length} done

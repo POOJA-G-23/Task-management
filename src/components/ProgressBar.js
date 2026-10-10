@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors, borderRadius } from '../styles/theme';
+import { colors } from '../styles/theme';
 import { useTheme } from '../context/ThemeContext';
 
 export const ProgressBar = ({ progress = 0, height = 10, showLabel = true }) => {

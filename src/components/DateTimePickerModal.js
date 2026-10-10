@@ -14,7 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius } from '../styles/theme';
 import { useTheme } from '../context/ThemeContext';
-import { formatDateToISO, formatTime12Hour } from '../utils/dateUtils';
+import { formatDateToISO } from '../utils/dateUtils';
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -30,7 +30,7 @@ export const DateTimePickerModal = ({
   onConfirm,
   onClose,
 }) => {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
 
   // Internal state for Date picking
   const initialDate = currentValue ? new Date(currentValue) : new Date();

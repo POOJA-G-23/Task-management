@@ -41,7 +41,7 @@ export const SettingsScreen = () => {
       const count = await clearCompletedTasks();
       setClearModalVisible(false);
       Alert.alert('Cleared Completed Tasks', `Removed ${count} completed task(s) from your storage.`);
-    } catch (e) {
+    } catch (_e) {
       Alert.alert('Error', 'Failed to clear completed tasks.');
     }
   };
@@ -51,7 +51,7 @@ export const SettingsScreen = () => {
       await resetWithSamples();
       setResetModalVisible(false);
       Alert.alert('Data Reset Successful', 'Original sample tasks have been restored for demonstration.');
-    } catch (e) {
+    } catch (_e) {
       Alert.alert('Error', 'Failed to reset application data.');
     }
   };
